@@ -16,11 +16,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 import entidad.Libro;
-import logica.GestorBiblioteca;
 import entidad.SolicitudPrestamo;
+import logica.GestorBiblioteca;
 
 public class BibliotecaGUI extends JFrame {
 
@@ -48,78 +48,105 @@ public class BibliotecaGUI extends JFrame {
 
     private void configurarVentana() {
         setTitle("Biblioteca Universitaria - Sistema de Préstamos");
-        setSize(980, 620);
+        setSize(1050, 680);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
     }
 
     private void crearComponentes() {
-        JPanel panelPrincipal = new JPanel(new BorderLayout(15, 15));
-        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        panelPrincipal.setBackground(new Color(245, 245, 245));
+        JPanel fondo = new JPanel(new BorderLayout());
+        fondo.setBackground(new Color(236, 239, 244));
+        fondo.setBorder(new EmptyBorder(25, 25, 25, 25));
 
-        JLabel lblTitulo = new JLabel("Sistema de Biblioteca Universitaria", SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 25));
-        lblTitulo.setForeground(new Color(80, 30, 45));
-        panelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        JPanel tarjetaPrincipal = new JPanel(new BorderLayout(20, 20));
+        tarjetaPrincipal.setBackground(Color.WHITE);
+        tarjetaPrincipal.setBorder(new EmptyBorder(25, 30, 25, 30));
 
-        JPanel panelCentro = new JPanel(new BorderLayout(15, 15));
-        panelCentro.setBackground(new Color(245, 245, 245));
+        JPanel cabecera = new JPanel(new BorderLayout());
+        cabecera.setBackground(Color.WHITE);
 
-        JPanel panelFormularios = new JPanel(new GridLayout(1, 2, 15, 15));
-        panelFormularios.setBackground(new Color(245, 245, 245));
+        JLabel lblTitulo = new JLabel("Biblioteca Universitaria");
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 30));
+        lblTitulo.setForeground(new Color(45, 52, 72));
 
+        JLabel lblSubtitulo = new JLabel("Sistema de registro de libros y gestión de préstamos mediante cola de atención");
+        lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lblSubtitulo.setForeground(new Color(100, 110, 125));
+
+        JPanel textosCabecera = new JPanel(new GridLayout(2, 1));
+        textosCabecera.setBackground(Color.WHITE);
+        textosCabecera.add(lblTitulo);
+        textosCabecera.add(lblSubtitulo);
+
+        cabecera.add(textosCabecera, BorderLayout.WEST);
+
+        JPanel panelFormularios = new JPanel(new GridLayout(1, 2, 20, 20));
+        panelFormularios.setBackground(Color.WHITE);
         panelFormularios.add(crearPanelRegistroLibro());
         panelFormularios.add(crearPanelSolicitudPrestamo());
 
-        JPanel panelBotones = crearPanelBotonesGenerales();
+        JPanel panelAcciones = crearPanelBotonesGenerales();
+
+        JPanel panelResultado = new JPanel(new BorderLayout(10, 10));
+        panelResultado.setBackground(new Color(248, 249, 252));
+        panelResultado.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+        JLabel lblResultado = new JLabel("Resultados del sistema");
+        lblResultado.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblResultado.setForeground(new Color(45, 52, 72));
 
         txtResultado = new JTextArea();
         txtResultado.setEditable(false);
         txtResultado.setFont(new Font("Consolas", Font.PLAIN, 14));
+        txtResultado.setForeground(new Color(35, 35, 35));
+        txtResultado.setBackground(Color.WHITE);
         txtResultado.setLineWrap(true);
         txtResultado.setWrapStyleWord(true);
+        txtResultado.setBorder(new EmptyBorder(12, 12, 12, 12));
 
         JScrollPane scrollResultado = new JScrollPane(txtResultado);
-        scrollResultado.setBorder(BorderFactory.createTitledBorder("Resultados del sistema"));
+        scrollResultado.setBorder(BorderFactory.createLineBorder(new Color(220, 225, 235)));
+
+        panelResultado.add(lblResultado, BorderLayout.NORTH);
+        panelResultado.add(scrollResultado, BorderLayout.CENTER);
 
         lblEstado = new JLabel("Sistema listo para registrar libros y solicitudes.", SwingConstants.CENTER);
-        lblEstado.setFont(new Font("Arial", Font.BOLD, 13));
-        lblEstado.setForeground(new Color(80, 30, 45));
+        lblEstado.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblEstado.setForeground(new Color(70, 80, 95));
+        lblEstado.setBorder(new EmptyBorder(8, 0, 0, 0));
 
-        panelCentro.add(panelFormularios, BorderLayout.NORTH);
-        panelCentro.add(panelBotones, BorderLayout.CENTER);
-        panelCentro.add(scrollResultado, BorderLayout.SOUTH);
+        tarjetaPrincipal.add(cabecera, BorderLayout.NORTH);
+        tarjetaPrincipal.add(panelFormularios, BorderLayout.CENTER);
+        tarjetaPrincipal.add(panelAcciones, BorderLayout.SOUTH);
 
-        panelPrincipal.add(panelCentro, BorderLayout.CENTER);
-        panelPrincipal.add(lblEstado, BorderLayout.SOUTH);
+        fondo.add(tarjetaPrincipal, BorderLayout.NORTH);
+        fondo.add(panelResultado, BorderLayout.CENTER);
+        fondo.add(lblEstado, BorderLayout.SOUTH);
 
-        add(panelPrincipal);
+        add(fondo);
     }
 
     private JPanel crearPanelRegistroLibro() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createTitledBorder("Registrar Libro"));
+        JPanel panel = crearTarjetaFormulario("Registrar libro");
 
-        JPanel campos = new JPanel(new GridLayout(3, 2, 10, 10));
-        campos.setBackground(Color.WHITE);
+        JPanel campos = new JPanel(new GridLayout(3, 2, 12, 14));
+        campos.setBackground(new Color(248, 249, 252));
 
-        txtCodigoLibro = new JTextField();
-        txtTituloLibro = new JTextField();
-        txtAutorLibro = new JTextField();
+        txtCodigoLibro = crearCampoTexto();
+        txtTituloLibro = crearCampoTexto();
+        txtAutorLibro = crearCampoTexto();
 
-        campos.add(new JLabel("Código / ISBN:"));
+        campos.add(crearEtiqueta("Código / ISBN:"));
         campos.add(txtCodigoLibro);
 
-        campos.add(new JLabel("Título:"));
+        campos.add(crearEtiqueta("Título:"));
         campos.add(txtTituloLibro);
 
-        campos.add(new JLabel("Autor:"));
+        campos.add(crearEtiqueta("Autor:"));
         campos.add(txtAutorLibro);
 
-        JButton btnRegistrarLibro = crearBoton("Registrar libro");
+        JButton btnRegistrarLibro = crearBotonPrincipal("Registrar libro");
         btnRegistrarLibro.addActionListener(e -> registrarLibro());
 
         panel.add(campos, BorderLayout.CENTER);
@@ -129,27 +156,25 @@ public class BibliotecaGUI extends JFrame {
     }
 
     private JPanel crearPanelSolicitudPrestamo() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createTitledBorder("Solicitar Préstamo"));
+        JPanel panel = crearTarjetaFormulario("Solicitar préstamo");
 
-        JPanel campos = new JPanel(new GridLayout(3, 2, 10, 10));
-        campos.setBackground(Color.WHITE);
+        JPanel campos = new JPanel(new GridLayout(3, 2, 12, 14));
+        campos.setBackground(new Color(248, 249, 252));
 
-        txtCodigoUsuario = new JTextField();
-        txtNombreUsuario = new JTextField();
-        txtCodigoLibroPrestamo = new JTextField();
+        txtCodigoUsuario = crearCampoTexto();
+        txtNombreUsuario = crearCampoTexto();
+        txtCodigoLibroPrestamo = crearCampoTexto();
 
-        campos.add(new JLabel("Código usuario:"));
+        campos.add(crearEtiqueta("Código usuario:"));
         campos.add(txtCodigoUsuario);
 
-        campos.add(new JLabel("Nombre usuario:"));
+        campos.add(crearEtiqueta("Nombre usuario:"));
         campos.add(txtNombreUsuario);
 
-        campos.add(new JLabel("Código libro:"));
+        campos.add(crearEtiqueta("Código libro:"));
         campos.add(txtCodigoLibroPrestamo);
 
-        JButton btnSolicitarPrestamo = crearBoton("Solicitar préstamo");
+        JButton btnSolicitarPrestamo = crearBotonPrincipal("Solicitar préstamo");
         btnSolicitarPrestamo.addActionListener(e -> solicitarPrestamo());
 
         panel.add(campos, BorderLayout.CENTER);
@@ -158,15 +183,32 @@ public class BibliotecaGUI extends JFrame {
         return panel;
     }
 
+    private JPanel crearTarjetaFormulario(String titulo) {
+        JPanel panel = new JPanel(new BorderLayout(12, 15));
+        panel.setBackground(new Color(248, 249, 252));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(225, 229, 236)),
+                new EmptyBorder(18, 18, 18, 18)
+        ));
+
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitulo.setForeground(new Color(45, 52, 72));
+
+        panel.add(lblTitulo, BorderLayout.NORTH);
+
+        return panel;
+    }
+
     private JPanel crearPanelBotonesGenerales() {
         JPanel panel = new JPanel(new GridLayout(1, 4, 15, 15));
-        panel.setBackground(new Color(245, 245, 245));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-        JButton btnAtender = crearBoton("Atender siguiente");
-        JButton btnVerCola = crearBoton("Ver cola");
-        JButton btnVerLibros = crearBoton("Ver libros");
-        JButton btnSalir = crearBoton("Salir");
+        JButton btnAtender = crearBotonSecundario("Atender siguiente");
+        JButton btnVerCola = crearBotonSecundario("Ver cola");
+        JButton btnVerLibros = crearBotonSecundario("Ver libros");
+        JButton btnSalir = crearBotonSalir("Salir");
 
         btnAtender.addActionListener(e -> atenderSiguienteSolicitud());
         btnVerCola.addActionListener(e -> verCola());
@@ -181,13 +223,61 @@ public class BibliotecaGUI extends JFrame {
         return panel;
     }
 
-    private JButton crearBoton(String texto) {
+    private JLabel crearEtiqueta(String texto) {
+        JLabel etiqueta = new JLabel(texto);
+        etiqueta.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        etiqueta.setForeground(new Color(55, 65, 80));
+        return etiqueta;
+    }
+
+    private JTextField crearCampoTexto() {
+        JTextField campo = new JTextField();
+        campo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        campo.setForeground(new Color(30, 30, 30));
+        campo.setBackground(Color.WHITE);
+        campo.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(210, 215, 225)),
+                new EmptyBorder(8, 10, 8, 10)
+        ));
+        return campo;
+    }
+
+    private JButton crearBotonPrincipal(String texto) {
         JButton boton = new JButton(texto);
-        boton.setFont(new Font("Arial", Font.BOLD, 13));
-        boton.setBackground(new Color(100, 35, 55));
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setBackground(new Color(48, 96, 160));
         boton.setForeground(Color.WHITE);
         boton.setFocusPainted(false);
+        boton.setBorder(new EmptyBorder(11, 15, 11, 15));
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setOpaque(true);
+        boton.setBorderPainted(false);
+        return boton;
+    }
+
+    private JButton crearBotonSecundario(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setBackground(new Color(230, 236, 245));
+        boton.setForeground(new Color(35, 55, 85));
+        boton.setFocusPainted(false);
+        boton.setBorder(new EmptyBorder(11, 15, 11, 15));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setOpaque(true);
+        boton.setBorderPainted(false);
+        return boton;
+    }
+
+    private JButton crearBotonSalir(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setBackground(new Color(180, 60, 70));
+        boton.setForeground(Color.WHITE);
+        boton.setFocusPainted(false);
+        boton.setBorder(new EmptyBorder(11, 15, 11, 15));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setOpaque(true);
+        boton.setBorderPainted(false);
         return boton;
     }
 
@@ -329,12 +419,6 @@ public class BibliotecaGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // Si falla, continúa con el diseño por defecto.
-        }
-
         java.awt.EventQueue.invokeLater(() -> {
             new BibliotecaGUI().setVisible(true);
         });

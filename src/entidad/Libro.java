@@ -1,19 +1,55 @@
 package entidad;
 
-/**
- * Clase modelo que representa un libro de la biblioteca.
- *
- * TODO: Definir los atributos necesarios (código/ISBN, título, autor,
- * disponibilidad, etc.).
- */
 public class Libro {
 
-	// TODO: declarar atributos
+	private String codigo;
+	private String titulo;
+	private String autor;
+	private boolean disponible;
 
-	// TODO: crear el constructor
+	public Libro(String codigo, String titulo, String autor) {
+		this.codigo = codigo;
+		this.titulo = titulo;
+		this.autor = autor;
+		this.disponible = true;
+	}
 
-	// TODO: crear getters y setters
+	public String getCodigo() {
+		return codigo;
+	}
 
-	// TODO: sobrescribir toString() para mostrar el libro de forma legible
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
+
+	public String getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public String getAutor() {
+		return autor;
+	}
+
+	public void setAutor(String autor) {
+		this.autor = autor;
+	}
+
+	public boolean isDisponible() {
+		return disponible;
+	}
+
+	public void setDisponible(boolean disponible) {
+		this.disponible = disponible;
+	}
+
+	@Override
+	public String toString() {
+		String estado = disponible ? "Disponible" : "No disponible";
+		return "[" + codigo + "] " + titulo + " - " + autor + " (" + estado + ")";
+	}
 
 }
