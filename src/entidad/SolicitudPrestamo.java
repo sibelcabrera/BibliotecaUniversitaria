@@ -8,12 +8,23 @@ package entidad;
  */
 public class SolicitudPrestamo {
 
-	// TODO: declarar atributos (usuario, libro)
-
-	// TODO: crear el constructor
-
-	// TODO: crear getters
-
-	// TODO: sobrescribir toString()
-
+    private Usuario usuario;
+    private Libro libro;
+    public SolicitudPrestamo(Usuario usuario, Libro libro) {
+        this.usuario = usuario;
+        this.libro = libro;
+    }
+    public Usuario getUsuario() {
+        return usuario;
+    }
+    public Libro getLibro() {
+        return libro;
+    }
+    @Override
+    public String toString() {
+        return "SolicitudPrestamo{" +
+                "usuario=" + usuario +
+                ", libro=" + libro +
+                '}';
+    }
 }
