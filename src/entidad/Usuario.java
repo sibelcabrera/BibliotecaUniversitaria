@@ -2,17 +2,36 @@ package entidad;
 
 /**
  * Clase modelo que representa al usuario que solicita un préstamo.
- *
- * TODO: Definir los atributos necesarios (código, nombre, etc.).
  */
 public class Usuario {
 
-	// TODO: declarar atributos
+	private String codigo;
+	private String nombre;
 
-	// TODO: crear el constructor
+	public Usuario(String codigo, String nombre) {
+		this.codigo = codigo;
+		this.nombre = nombre;
+	}
 
-	// TODO: crear getters y setters
+	public String getCodigo() {
+		return codigo;
+	}
 
-	// TODO: sobrescribir toString()
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	@Override
+	public String toString() {
+		return "[" + codigo + "] " + nombre;
+	}
 
 }
