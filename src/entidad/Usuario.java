@@ -3,7 +3,6 @@ package entidad;
 import java.util.regex.Pattern;
 
 /**
- * Clase modelo que representa al usuario que solicita un préstamo.
  * Todos los setters validan sus datos antes de asignarlos; el constructor
  * reutiliza los setters para no duplicar (ni saltarse) esas validaciones.
  */
