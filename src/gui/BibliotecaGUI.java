@@ -34,7 +34,7 @@ public class BibliotecaGUI extends JFrame {
 
     private JTextField txtCodigoUsuario;
     private JTextField txtNombreUsuario;
-    private JTextField txtCodigoLibroPrestamo;
+    private JTextField txtTituloLibroPrestamo;
 
     private JTextArea txtResultado;
     private JLabel lblEstado;
@@ -164,7 +164,7 @@ public class BibliotecaGUI extends JFrame {
 
         txtCodigoUsuario = crearCampoTexto();
         txtNombreUsuario = crearCampoTexto();
-        txtCodigoLibroPrestamo = crearCampoTexto();
+        txtTituloLibroPrestamo = crearCampoTexto();
 
         campos.add(crearEtiqueta("Código usuario:"));
         campos.add(txtCodigoUsuario);
@@ -172,8 +172,8 @@ public class BibliotecaGUI extends JFrame {
         campos.add(crearEtiqueta("Nombre usuario:"));
         campos.add(txtNombreUsuario);
 
-        campos.add(crearEtiqueta("Código libro:"));
-        campos.add(txtCodigoLibroPrestamo);
+        campos.add(crearEtiqueta("Título del libro:"));
+        campos.add(txtTituloLibroPrestamo);
 
         JButton btnSolicitarPrestamo = crearBotonPrincipal("Solicitar préstamo");
         btnSolicitarPrestamo.addActionListener(e -> solicitarPrestamo());
@@ -320,12 +320,19 @@ public class BibliotecaGUI extends JFrame {
         try {
             String codigoUsuario = txtCodigoUsuario.getText();
             String nombreUsuario = txtNombreUsuario.getText();
-            String codigoLibro = txtCodigoLibroPrestamo.getText();
+            String tituloBuscado = txtTituloLibroPrestamo.getText();
+
+            Libro libroSeleccionado = resolverLibroPorTitulo(tituloBuscado);
+            if (libroSeleccionado == null) {
+                // El usuario canceló la selección o no hubo coincidencias
+                // (el mensaje de error ya fue mostrado en resolverLibroPorTitulo).
+                return;
+            }
 
             SolicitudPrestamo solicitud = gestor.solicitarPrestamo(
                     codigoUsuario,
                     nombreUsuario,
-                    codigoLibro
+                    libroSeleccionado.getCodigo()
             );
 
             JOptionPane.showMessageDialog(
@@ -343,6 +350,44 @@ public class BibliotecaGUI extends JFrame {
         } catch (Exception e) {
             mostrarError(e.getMessage());
         }
+    }
+
+    /**
+     * Busca libros por título (no por código). Si no hay coincidencias,
+     * muestra un error y devuelve null. Si hay una sola coincidencia, la
+     * devuelve directamente. Si hay varias, muestra una lista para que el
+     * usuario elija cuál es el libro correcto (el título no es clave única).
+     */
+    private Libro resolverLibroPorTitulo(String tituloBuscado) {
+        if (tituloBuscado == null || tituloBuscado.trim().isEmpty()) {
+            mostrarError("Debe ingresar el título del libro a solicitar.");
+            return null;
+        }
+
+        java.util.List<Libro> coincidencias = gestor.buscarLibrosPorTitulo(tituloBuscado);
+
+        if (coincidencias.isEmpty()) {
+            mostrarError("No se encontró ningún libro cuyo título contenga \"" + tituloBuscado.trim() + "\".");
+            return null;
+        }
+
+        if (coincidencias.size() == 1) {
+            return coincidencias.get(0);
+        }
+
+        // Varias coincidencias: se muestra una lista para que el usuario elija.
+        Libro[] opciones = coincidencias.toArray(new Libro[0]);
+        Libro elegido = (Libro) JOptionPane.showInputDialog(
+                this,
+                "Se encontraron varios libros con ese título.\nSeleccione el libro correcto:",
+                "Selección de libro",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+
+        return elegido;
     }
 
     private void atenderSiguienteSolicitud() {
@@ -446,7 +491,7 @@ public class BibliotecaGUI extends JFrame {
     private void limpiarCamposPrestamo() {
         txtCodigoUsuario.setText("");
         txtNombreUsuario.setText("");
-        txtCodigoLibroPrestamo.setText("");
+        txtTituloLibroPrestamo.setText("");
         txtCodigoUsuario.requestFocus();
     }
 
