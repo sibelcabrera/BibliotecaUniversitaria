@@ -5,10 +5,6 @@ import java.util.regex.Pattern;
 /**
  * Todos los setters validan sus datos antes de asignarlos; el constructor
  * reutiliza los setters para no duplicar (ni saltarse) esas validaciones.
- *
- * El campo "disponible" y su relación con el stock son responsabilidad
- * de la persona encargada del stock; aquí solo se valida su tipo (boolean),
- * que no admite nulos.
  */
 public class Libro {
 
@@ -21,28 +17,31 @@ public class Libro {
 	private String codigo;
 	private String titulo;
 	private String autor;
-	private boolean disponible;
+	private int stock;
 
 	/**
-	 * @throws IllegalArgumentException si alguno de los datos no cumple las
-	 *         validaciones de su setter correspondiente (ver setCodigo,
-	 *         setTitulo, setAutor).
+	 * Constructor por defecto con stock en 1 para mantener compatibilidad.
 	 */
 	public Libro(String codigo, String titulo, String autor) {
+		this(codigo, titulo, autor, 1);
+	}
+
+	/**
+	 * Constructor completo con campo stock.
+	 * 
+	 * @throws IllegalArgumentException si alguno de los datos no cumple las validaciones.
+	 */
+	public Libro(String codigo, String titulo, String autor, int stock) {
 		setCodigo(codigo);
 		setTitulo(titulo);
 		setAutor(autor);
-		setDisponible(true);
+		setStock(stock);
 	}
 
 	public String getCodigo() {
 		return codigo;
 	}
 
-	/**
-	 * @throws IllegalArgumentException si el código es nulo, está vacío,
-	 *         no alcanza la longitud mínima o contiene caracteres no permitidos.
-	 */
 	public void setCodigo(String codigo) {
 		if (codigo == null || codigo.trim().isEmpty()) {
 			throw new IllegalArgumentException("El código del libro no puede estar vacío.");
@@ -63,10 +62,6 @@ public class Libro {
 		return titulo;
 	}
 
-	/**
-	 * @throws IllegalArgumentException si el título es nulo, está vacío
-	 *         o no alcanza la longitud mínima.
-	 */
 	public void setTitulo(String titulo) {
 		if (titulo == null || titulo.trim().isEmpty()) {
 			throw new IllegalArgumentException("El título del libro no puede estar vacío.");
@@ -83,10 +78,6 @@ public class Libro {
 		return autor;
 	}
 
-	/**
-	 * @throws IllegalArgumentException si el autor es nulo, está vacío,
-	 *         no alcanza la longitud mínima o contiene caracteres no permitidos.
-	 */
 	public void setAutor(String autor) {
 		if (autor == null || autor.trim().isEmpty()) {
 			throw new IllegalArgumentException("El autor del libro no puede estar vacío.");
@@ -103,22 +94,51 @@ public class Libro {
 		this.autor = valor;
 	}
 
-	public boolean isDisponible() {
-		return disponible;
+	public int getStock() {
+		return stock;
 	}
 
 	/**
-	 * No lanza excepciones: al ser un tipo primitivo boolean, no admite
-	 * valores nulos ni inválidos, por lo que no requiere validación.
+	 * Valida que el stock no sea un valor negativo.
+	 * 
+	 * @throws IllegalArgumentException si el stock es menor a 0.
 	 */
-	public void setDisponible(boolean disponible) {
-		this.disponible = disponible;
+	public void setStock(int stock) {
+		if (stock < 0) {
+			throw new IllegalArgumentException("El stock no puede ser negativo.");
+		}
+		this.stock = stock;
+	}
+
+	/**
+	 * Disminuye en 1 el stock del libro al ser entregado prestado.
+	 * 
+	 * @throws IllegalStateException si el stock ya es 0.
+	 */
+	public void disminuirStock() {
+		if (this.stock <= 0) {
+			throw new IllegalStateException("No hay stock suficiente disponible para este libro.");
+		}
+		this.stock--;
+	}
+
+	/**
+	 * Incrementa en 1 el stock del libro al ser devuelto.
+	 */
+	public void incrementarStock() {
+		this.stock++;
+	}
+
+	/**
+	 * Calculado automáticamente: está disponible si hay stock > 0.
+	 */
+	public boolean isDisponible() {
+		return this.stock > 0;
 	}
 
 	@Override
 	public String toString() {
-		String estado = disponible ? "Disponible" : "No disponible";
+		String estado = isDisponible() ? "Disponible (" + stock + ")" : "Agotado";
 		return "[" + codigo + "] " + titulo + " - " + autor + " (" + estado + ")";
 	}
-
 }
