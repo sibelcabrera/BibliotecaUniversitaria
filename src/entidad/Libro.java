@@ -3,11 +3,10 @@ package entidad;
 import java.util.regex.Pattern;
 
 /**
- * Clase modelo que representa un libro del catálogo.
  * Todos los setters validan sus datos antes de asignarlos; el constructor
  * reutiliza los setters para no duplicar (ni saltarse) esas validaciones.
  *
- * Nota: el campo "disponible" y su relación con el stock son responsabilidad
+ * El campo "disponible" y su relación con el stock son responsabilidad
  * de la persona encargada del stock; aquí solo se valida su tipo (boolean),
  * que no admite nulos.
  */
