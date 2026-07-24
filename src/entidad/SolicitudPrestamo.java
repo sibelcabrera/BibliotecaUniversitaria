@@ -1,52 +1,41 @@
-package logica;
+package entidad;
 
-import entidad.Libro;
-import entidad.SolicitudPrestamo;
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Representa una solicitud de préstamo: relaciona un usuario con un libro.
+ * Es el objeto que se va a encolar en la cola de atención.
+ *
+ * Esta clase es inmutable (no expone setters), por lo que la validación
+ * se concentra en el constructor.
+ */
+public class SolicitudPrestamo {
 
-public class GestorBiblioteca {
-
-    private List<Libro> catalogo;
-
-    public GestorBiblioteca() {
-        this.catalogo = new ArrayList<>();
-    }
-
-    /**
-     * Permite agregar un libro especificado con su cantidad inicial de stock.
-     */
-    public void agregarLibro(String codigo, String titulo, String autor, int stock) {
-        Libro libro = new Libro(codigo, titulo, autor, stock);
-        catalogo.add(libro);
-    }
+    private Usuario usuario;
+    private Libro libro;
 
     /**
-     * Procesa la entrega de un libro al usuario, disminuyendo su stock.
+     * @throws IllegalArgumentException si el usuario o el libro son nulos.
      */
-    public void entregarPrestamo(SolicitudPrestamo solicitud) {
-        if (solicitud == null || solicitud.getLibro() == null) {
-            throw new IllegalArgumentException("La solicitud o el libro son nulos.");
+    public SolicitudPrestamo(Usuario usuario, Libro libro) {
+        if (usuario == null) {
+            throw new IllegalArgumentException("La solicitud de préstamo debe tener un usuario asociado.");
         }
-        
-        Libro libro = solicitud.getLibro();
-        // Disminuye stock de forma segura
-        libro.disminuirStock();
-    }
-
-    /**
-     * Procesa la devolución del libro prestado, incrementando su stock.
-     */
-    public void devolverLibro(Libro libro) {
         if (libro == null) {
-            throw new IllegalArgumentException("El libro a devolver no puede ser nulo.");
+            throw new IllegalArgumentException("La solicitud de préstamo debe tener un libro asociado.");
         }
-        
-        // Incrementa stock
-        libro.incrementarStock();
+        this.usuario = usuario;
+        this.libro = libro;
     }
-
-    public List<Libro> getCatalogo() {
-        return catalogo;
+    public Usuario getUsuario() {
+        return usuario;
+    }
+    public Libro getLibro() {
+        return libro;
+    }
+    @Override
+    public String toString() {
+        return "SolicitudPrestamo{" +
+                "usuario=" + usuario +
+                ", libro=" + libro +
+                '}';
     }
 }

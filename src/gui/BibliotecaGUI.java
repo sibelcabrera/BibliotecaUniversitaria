@@ -1,4 +1,5 @@
 package gui;
+
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -31,6 +32,7 @@ public class BibliotecaGUI extends JFrame {
     private JTextField txtCodigoLibro;
     private JTextField txtTituloLibro;
     private JTextField txtAutorLibro;
+    private JTextField txtStockLibro;
 
     private JTextField txtCodigoUsuario;
     private JTextField txtNombreUsuario;
@@ -48,7 +50,7 @@ public class BibliotecaGUI extends JFrame {
 
     private void configurarVentana() {
         setTitle("Biblioteca Universitaria - Sistema de Préstamos");
-        setSize(1050, 760);
+        setSize(1050, 780);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -59,13 +61,13 @@ public class BibliotecaGUI extends JFrame {
         fondo.setBackground(new Color(236, 239, 244));
         fondo.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // ===== CABECERA =====
         JLabel lblTitulo = new JLabel("Biblioteca Universitaria", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 30));
         lblTitulo.setForeground(new Color(45, 52, 72));
 
-        JLabel lblSubtitulo = new JLabel("Sistema de registro de libros y gestión de préstamos mediante cola de atención", SwingConstants.CENTER);
+        JLabel lblSubtitulo = new JLabel("Sistema de registro de libros, solicitudes y entregas con stock");
         lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lblSubtitulo.setHorizontalAlignment(SwingConstants.CENTER);
         lblSubtitulo.setForeground(new Color(90, 100, 115));
 
         JPanel cabecera = new JPanel(new GridLayout(2, 1));
@@ -73,13 +75,11 @@ public class BibliotecaGUI extends JFrame {
         cabecera.add(lblTitulo);
         cabecera.add(lblSubtitulo);
 
-        // ===== FORMULARIOS ARRIBA =====
         JPanel panelFormularios = new JPanel(new GridLayout(1, 2, 20, 20));
         panelFormularios.setBackground(new Color(236, 239, 244));
         panelFormularios.add(crearPanelRegistroLibro());
         panelFormularios.add(crearPanelSolicitudPrestamo());
 
-        // ===== BOTONES EN EL MEDIO =====
         JPanel panelBotones = crearPanelBotonesGenerales();
 
         JPanel panelSuperior = new JPanel(new BorderLayout(15, 15));
@@ -87,10 +87,9 @@ public class BibliotecaGUI extends JFrame {
         panelSuperior.add(panelFormularios, BorderLayout.CENTER);
         panelSuperior.add(panelBotones, BorderLayout.SOUTH);
 
-        // ===== RESULTADOS ABAJO =====
         JPanel panelResultado = new JPanel(new BorderLayout(10, 10));
         panelResultado.setBackground(Color.WHITE);
-        panelResultado.setPreferredSize(new Dimension(1000, 230));
+        panelResultado.setPreferredSize(new Dimension(1000, 240));
         panelResultado.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(210, 215, 225)),
                 new EmptyBorder(15, 15, 15, 15)
@@ -107,7 +106,7 @@ public class BibliotecaGUI extends JFrame {
         txtResultado.setBackground(Color.WHITE);
         txtResultado.setLineWrap(true);
         txtResultado.setWrapStyleWord(true);
-        txtResultado.setText("Aquí aparecerán los libros registrados, la cola de préstamos y las solicitudes atendidas.");
+        txtResultado.setText("Aquí aparecerán los libros registrados, las solicitudes y las entregas realizadas.");
         txtResultado.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JScrollPane scrollResultado = new JScrollPane(txtResultado);
@@ -116,7 +115,6 @@ public class BibliotecaGUI extends JFrame {
         panelResultado.add(lblResultado, BorderLayout.NORTH);
         panelResultado.add(scrollResultado, BorderLayout.CENTER);
 
-        // ===== ESTADO =====
         lblEstado = new JLabel("Sistema listo para registrar libros y solicitudes.", SwingConstants.CENTER);
         lblEstado.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblEstado.setForeground(new Color(70, 80, 95));
@@ -131,12 +129,13 @@ public class BibliotecaGUI extends JFrame {
     private JPanel crearPanelRegistroLibro() {
         JPanel panel = crearTarjetaFormulario("Registrar libro");
 
-        JPanel campos = new JPanel(new GridLayout(3, 2, 12, 14));
+        JPanel campos = new JPanel(new GridLayout(4, 2, 12, 14));
         campos.setBackground(new Color(248, 249, 252));
 
         txtCodigoLibro = crearCampoTexto();
         txtTituloLibro = crearCampoTexto();
         txtAutorLibro = crearCampoTexto();
+        txtStockLibro = crearCampoTexto();
 
         campos.add(crearEtiqueta("Código / ISBN:"));
         campos.add(txtCodigoLibro);
@@ -146,6 +145,9 @@ public class BibliotecaGUI extends JFrame {
 
         campos.add(crearEtiqueta("Autor:"));
         campos.add(txtAutorLibro);
+
+        campos.add(crearEtiqueta("Stock:"));
+        campos.add(txtStockLibro);
 
         JButton btnRegistrarLibro = crearBotonPrincipal("Registrar libro");
         btnRegistrarLibro.addActionListener(e -> registrarLibro());
@@ -202,22 +204,19 @@ public class BibliotecaGUI extends JFrame {
     }
 
     private JPanel crearPanelBotonesGenerales() {
-        JPanel panel = new JPanel(new GridLayout(1, 4, 15, 15));
-        panel.setBackground(Color.WHITE);
+        JPanel panel = new JPanel(new GridLayout(1, 3, 15, 15));
+        panel.setBackground(new Color(236, 239, 244));
         panel.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-        JButton btnAtender = crearBotonSecundario("Atender siguiente");
-        JButton btnVerCola = crearBotonSecundario("Ver cola");
+        JButton btnGestionarEntregas = crearBotonSecundario("Gestionar entregas");
         JButton btnVerLibros = crearBotonSecundario("Ver libros");
         JButton btnSalir = crearBotonSalir("Salir");
 
-        btnAtender.addActionListener(e -> atenderSiguienteSolicitud());
-        btnVerCola.addActionListener(e -> verCola());
+        btnGestionarEntregas.addActionListener(e -> abrirDialogoEntregas());
         btnVerLibros.addActionListener(e -> verLibros());
         btnSalir.addActionListener(e -> salir());
 
-        panel.add(btnAtender);
-        panel.add(btnVerCola);
+        panel.add(btnGestionarEntregas);
         panel.add(btnVerLibros);
         panel.add(btnSalir);
 
@@ -237,11 +236,9 @@ public class BibliotecaGUI extends JFrame {
         campo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         campo.setForeground(Color.BLACK);
         campo.setBackground(Color.WHITE);
-
         campo.setEditable(true);
         campo.setFocusable(true);
         campo.setEnabled(true);
-
         campo.setPreferredSize(new Dimension(220, 36));
 
         campo.setBorder(BorderFactory.createCompoundBorder(
@@ -296,8 +293,21 @@ public class BibliotecaGUI extends JFrame {
             String codigo = txtCodigoLibro.getText();
             String titulo = txtTituloLibro.getText();
             String autor = txtAutorLibro.getText();
+            String stockTexto = txtStockLibro.getText();
 
-            Libro libro = gestor.registrarLibro(codigo, titulo, autor);
+            if (stockTexto == null || stockTexto.trim().isEmpty()) {
+                throw new IllegalArgumentException("El stock del libro no puede estar vacío.");
+            }
+
+            int stock;
+
+            try {
+                stock = Integer.parseInt(stockTexto.trim());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("El stock debe ser un número entero.");
+            }
+
+            Libro libro = gestor.registrarLibro(codigo, titulo, autor, stock);
 
             JOptionPane.showMessageDialog(
                     this,
@@ -336,48 +346,27 @@ public class BibliotecaGUI extends JFrame {
             );
 
             limpiarCamposPrestamo();
-            mostrarColaPrestamos();
 
-            lblEstado.setText("Solicitud agregada a la cola.");
-
-        } catch (Exception e) {
-            mostrarError(e.getMessage());
-        }
-    }
-
-    private void atenderSiguienteSolicitud() {
-        try {
-            SolicitudPrestamo solicitud = gestor.atenderSiguienteSolicitud();
-
-            String mensaje = "Solicitud atendida correctamente:\n"
+            txtResultado.setText(
+                    "Solicitud agregada a la cola de entregas.\n\n"
                     + solicitud.toString()
-                    + "\n\nEl libro fue marcado como NO DISPONIBLE.\n\n"
-                    + "=== COLA ACTUALIZADA ===\n\n"
-                    + gestor.getColaSolicitudes().listarComoTexto();
-
-            txtResultado.setText(mensaje);
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Solicitud atendida correctamente.",
-                    "Solicitud atendida",
-                    JOptionPane.INFORMATION_MESSAGE
+                    + "\n\nPara ver la cola o entregar el siguiente libro, use el botón: Gestionar entregas."
             );
 
-            lblEstado.setText("Se atendió la siguiente solicitud de la cola.");
+            lblEstado.setText("Solicitud agregada a la cola de entregas.");
 
         } catch (Exception e) {
             mostrarError(e.getMessage());
         }
     }
 
-    private void verCola() {
-        try {
-            mostrarColaPrestamos();
-            lblEstado.setText("Mostrando cola de solicitudes.");
-        } catch (Exception e) {
-            mostrarError(e.getMessage());
-        }
+    private void abrirDialogoEntregas() {
+        ColaDialog dialogo = new ColaDialog(this, gestor, () -> {
+            mostrarListadoLibros();
+            lblEstado.setText("Libro entregado correctamente. Stock actualizado.");
+        });
+
+        dialogo.setVisible(true);
     }
 
     private void verLibros() {
@@ -388,7 +377,7 @@ public class BibliotecaGUI extends JFrame {
             mostrarError(e.getMessage());
         }
     }
-    
+
     private void mostrarListadoLibros() {
         if (gestor.getLibros().isEmpty()) {
             txtResultado.setText("No hay libros registrados.");
@@ -410,12 +399,6 @@ public class BibliotecaGUI extends JFrame {
         }
 
         txtResultado.setText(resultado.toString());
-    }
-    
-    private void mostrarColaPrestamos() {
-        String textoCola = gestor.getColaSolicitudes().listarComoTexto();
-
-        txtResultado.setText("=== COLA DE SOLICITUDES DE PRÉSTAMO ===\n\n" + textoCola);
     }
 
     private void salir() {
@@ -440,6 +423,7 @@ public class BibliotecaGUI extends JFrame {
         txtCodigoLibro.setText("");
         txtTituloLibro.setText("");
         txtAutorLibro.setText("");
+        txtStockLibro.setText("");
         txtCodigoLibro.requestFocus();
     }
 
