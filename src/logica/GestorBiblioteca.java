@@ -42,6 +42,24 @@ public class GestorBiblioteca {
 
         return libro;
     }
+    
+    public List<Libro> buscarLibrosPorTitulo(String textoTitulo) {
+        List<Libro> resultados = new ArrayList<>();
+
+        if (textoTitulo == null || textoTitulo.trim().isEmpty()) {
+            return resultados;
+        }
+
+        String filtro = textoTitulo.trim().toLowerCase();
+
+        for (Libro libro : libros) {
+            if (libro.getTitulo().toLowerCase().contains(filtro)) {
+                resultados.add(libro);
+            }
+        }
+
+        return resultados;
+    }
 
     public Libro buscarLibroPorCodigo(String codigo) {
         if (codigo == null || codigo.trim().isEmpty()) {
@@ -56,16 +74,24 @@ public class GestorBiblioteca {
 
         return null;
     }
-
+    
     public SolicitudPrestamo solicitarPrestamo(String codigoUsuario, String nombreUsuario, String codigoLibro) {
-        Usuario usuario = new Usuario(codigoUsuario, nombreUsuario);
-
         Libro libro = buscarLibroPorCodigo(codigoLibro);
 
         if (libro == null) {
             throw new IllegalArgumentException(
                     "No existe un libro registrado con el código \"" + codigoLibro.trim() + "\"."
             );
+        }
+
+        return solicitarPrestamo(codigoUsuario, nombreUsuario, libro);
+    }
+
+    public SolicitudPrestamo solicitarPrestamo(String codigoUsuario, String nombreUsuario, Libro libro) {
+        Usuario usuario = new Usuario(codigoUsuario, nombreUsuario);
+
+        if (libro == null) {
+            throw new IllegalArgumentException("Debe seleccionar un libro para solicitar el préstamo.");
         }
 
         if (!libro.isDisponible()) {

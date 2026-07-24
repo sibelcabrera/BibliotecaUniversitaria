@@ -18,6 +18,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JTable;
+import javax.swing.JComboBox;
 
 import entidad.Libro;
 import entidad.SolicitudPrestamo;
@@ -36,9 +38,12 @@ public class BibliotecaGUI extends JFrame {
 
     private JTextField txtCodigoUsuario;
     private JTextField txtNombreUsuario;
-    private JTextField txtCodigoLibroPrestamo;
+    private JTextField txtBuscarTituloLibro;
+    private JComboBox<Libro> cboLibrosEncontrados;
 
     private JTextArea txtResultado;
+    private JTable tablaLibros;
+    private LibroTableModel modeloLibros;
     private JLabel lblEstado;
 
     public BibliotecaGUI() {
@@ -99,17 +104,18 @@ public class BibliotecaGUI extends JFrame {
         lblResultado.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblResultado.setForeground(new Color(45, 52, 72));
 
-        txtResultado = new JTextArea();
-        txtResultado.setEditable(false);
-        txtResultado.setFont(new Font("Consolas", Font.PLAIN, 14));
-        txtResultado.setForeground(Color.BLACK);
-        txtResultado.setBackground(Color.WHITE);
-        txtResultado.setLineWrap(true);
-        txtResultado.setWrapStyleWord(true);
-        txtResultado.setText("Aquí aparecerán los libros registrados, las solicitudes y las entregas realizadas.");
-        txtResultado.setBorder(new EmptyBorder(10, 10, 10, 10));
+        modeloLibros = new LibroTableModel(gestor.getLibros());
+        tablaLibros = new JTable(modeloLibros);
 
-        JScrollPane scrollResultado = new JScrollPane(txtResultado);
+        tablaLibros.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        tablaLibros.setRowHeight(28);
+        tablaLibros.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        tablaLibros.getTableHeader().setBackground(new Color(230, 236, 245));
+        tablaLibros.getTableHeader().setForeground(new Color(35, 55, 85));
+
+        tablaLibros.getColumnModel().getColumn(4).setCellRenderer(new EstadoCellRenderer());
+
+        JScrollPane scrollResultado = new JScrollPane(tablaLibros);
         scrollResultado.setBorder(BorderFactory.createLineBorder(new Color(220, 225, 235)));
 
         panelResultado.add(lblResultado, BorderLayout.NORTH);
@@ -149,7 +155,7 @@ public class BibliotecaGUI extends JFrame {
         campos.add(crearEtiqueta("Stock:"));
         campos.add(txtStockLibro);
 
-        JButton btnRegistrarLibro = crearBotonPrincipal("Registrar libro");
+        JButton btnRegistrarLibro = crearBotonPrincipal("Registrar Nuevo Libro");
         btnRegistrarLibro.addActionListener(e -> registrarLibro());
 
         panel.add(campos, BorderLayout.CENTER);
@@ -161,12 +167,16 @@ public class BibliotecaGUI extends JFrame {
     private JPanel crearPanelSolicitudPrestamo() {
         JPanel panel = crearTarjetaFormulario("Solicitar préstamo");
 
-        JPanel campos = new JPanel(new GridLayout(3, 2, 12, 14));
+        JPanel campos = new JPanel(new GridLayout(4, 2, 12, 14));
         campos.setBackground(new Color(248, 249, 252));
 
         txtCodigoUsuario = crearCampoTexto();
         txtNombreUsuario = crearCampoTexto();
-        txtCodigoLibroPrestamo = crearCampoTexto();
+        txtBuscarTituloLibro = crearCampoTexto();
+        cboLibrosEncontrados = new javax.swing.JComboBox<>();
+
+        cboLibrosEncontrados.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cboLibrosEncontrados.setBackground(Color.WHITE);
 
         campos.add(crearEtiqueta("Código usuario:"));
         campos.add(txtCodigoUsuario);
@@ -174,8 +184,14 @@ public class BibliotecaGUI extends JFrame {
         campos.add(crearEtiqueta("Nombre usuario:"));
         campos.add(txtNombreUsuario);
 
-        campos.add(crearEtiqueta("Código libro:"));
-        campos.add(txtCodigoLibroPrestamo);
+        campos.add(crearEtiqueta("Buscar título:"));
+        campos.add(txtBuscarTituloLibro);
+
+        JButton btnBuscarLibro = crearBotonSecundario("Buscar libro");
+        btnBuscarLibro.addActionListener(e -> buscarLibrosPorTitulo());
+
+        campos.add(btnBuscarLibro);
+        campos.add(cboLibrosEncontrados);
 
         JButton btnSolicitarPrestamo = crearBotonPrincipal("Solicitar préstamo");
         btnSolicitarPrestamo.addActionListener(e -> solicitarPrestamo());
@@ -209,7 +225,7 @@ public class BibliotecaGUI extends JFrame {
         panel.setBorder(new EmptyBorder(5, 0, 0, 0));
 
         JButton btnGestionarEntregas = crearBotonSecundario("Gestionar entregas");
-        JButton btnVerLibros = crearBotonSecundario("Ver libros");
+        JButton btnVerLibros = crearBotonSecundario("Catálogo de Libros");
         JButton btnSalir = crearBotonSalir("Salir");
 
         btnGestionarEntregas.addActionListener(e -> abrirDialogoEntregas());
@@ -325,17 +341,41 @@ public class BibliotecaGUI extends JFrame {
             mostrarError(e.getMessage());
         }
     }
+    
+    private void buscarLibrosPorTitulo() {
+        try {
+            String tituloBuscado = txtBuscarTituloLibro.getText();
+
+            java.util.List<Libro> resultados = gestor.buscarLibrosPorTitulo(tituloBuscado);
+
+            cboLibrosEncontrados.removeAllItems();
+
+            if (resultados.isEmpty()) {
+                throw new IllegalArgumentException("No se encontraron libros con ese título.");
+            }
+
+            for (Libro libro : resultados) {
+                cboLibrosEncontrados.addItem(libro);
+            }
+
+            lblEstado.setText("Seleccione un libro de la lista de resultados.");
+
+        } catch (Exception e) {
+            mostrarError(e.getMessage());
+        }
+    }
 
     private void solicitarPrestamo() {
         try {
             String codigoUsuario = txtCodigoUsuario.getText();
             String nombreUsuario = txtNombreUsuario.getText();
-            String codigoLibro = txtCodigoLibroPrestamo.getText();
+
+            Libro libroSeleccionado = (Libro) cboLibrosEncontrados.getSelectedItem();
 
             SolicitudPrestamo solicitud = gestor.solicitarPrestamo(
                     codigoUsuario,
                     nombreUsuario,
-                    codigoLibro
+                    libroSeleccionado
             );
 
             JOptionPane.showMessageDialog(
@@ -347,11 +387,7 @@ public class BibliotecaGUI extends JFrame {
 
             limpiarCamposPrestamo();
 
-            txtResultado.setText(
-                    "Solicitud agregada a la cola de entregas.\n\n"
-                    + solicitud.toString()
-                    + "\n\nPara ver la cola o entregar el siguiente libro, use el botón: Gestionar entregas."
-            );
+            modeloLibros.actualizarDatos();
 
             lblEstado.setText("Solicitud agregada a la cola de entregas.");
 
@@ -379,26 +415,13 @@ public class BibliotecaGUI extends JFrame {
     }
 
     private void mostrarListadoLibros() {
+        modeloLibros.actualizarDatos();
+
         if (gestor.getLibros().isEmpty()) {
-            txtResultado.setText("No hay libros registrados.");
-            return;
+            lblEstado.setText("No hay libros registrados.");
+        } else {
+            lblEstado.setText("Catálogo de libros actualizado.");
         }
-
-        StringBuilder resultado = new StringBuilder();
-        resultado.append("=== LIBROS REGISTRADOS ===\n\n");
-
-        int posicion = 1;
-
-        for (Libro libro : gestor.getLibros()) {
-            resultado.append(posicion)
-                    .append(". ")
-                    .append(libro.toString())
-                    .append("\n");
-
-            posicion++;
-        }
-
-        txtResultado.setText(resultado.toString());
     }
 
     private void salir() {
@@ -430,7 +453,8 @@ public class BibliotecaGUI extends JFrame {
     private void limpiarCamposPrestamo() {
         txtCodigoUsuario.setText("");
         txtNombreUsuario.setText("");
-        txtCodigoLibroPrestamo.setText("");
+        txtBuscarTituloLibro.setText("");
+        cboLibrosEncontrados.removeAllItems();
         txtCodigoUsuario.requestFocus();
     }
 

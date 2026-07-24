@@ -53,13 +53,16 @@ public class ColaPrestamos {
     // 7. TODO: método desencolar() -> debe validar que la cola no esté vacía
     public SolicitudPrestamo desencolar() {
         if (estaVacia()) {
-            return null; 
+            throw new IllegalStateException("No hay solicitudes en la cola.");
         }
+
         SolicitudPrestamo informacion = frente.informacion;
         frente = frente.siguiente;
+
         if (frente == null) {
-            fin = null; // Si la cola se quedó vacía, el fin también pasa a ser null
+            fin = null;
         }
+
         tamano--;
         return informacion;
     }
@@ -67,8 +70,9 @@ public class ColaPrestamos {
     // 8. TODO: método verFrente() -> debe validar que la cola no esté vacía
     public SolicitudPrestamo verFrente() {
         if (estaVacia()) {
-            return null;
+            throw new IllegalStateException("No hay solicitudes en la cola.");
         }
+
         return frente.informacion;
     }
 

@@ -33,9 +33,7 @@ public class SolicitudPrestamo {
     }
     @Override
     public String toString() {
-        return "SolicitudPrestamo{" +
-                "usuario=" + usuario +
-                ", libro=" + libro +
-                '}';
+        return "Usuario: " + usuario.toString() + "\n"
+             + "Libro: " + libro.toString();
     }
 }
